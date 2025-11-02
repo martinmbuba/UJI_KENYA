@@ -22,6 +22,7 @@ const nextBtn = document.getElementById('next-btn');
 const backHomeBtn = document.getElementById('back-home-btn');
 const ceoMessage = document.getElementById('ceo-message');
 const ordersBtn = document.getElementById('orders-btn');
+const mainContent = document.getElementById('main-content');
 const loginModal = document.getElementById('login-modal');
 const registerModal = document.getElementById('register-modal');
 const loginForm = document.getElementById('login-form');
@@ -30,6 +31,7 @@ const switchToRegister = document.getElementById('switch-to-register');
 const switchToLogin = document.getElementById('switch-to-login');
 const cancelLogin = document.getElementById('cancel-login');
 const cancelRegister = document.getElementById('cancel-register');
+const ceoModal = document.getElementById('ceo-modal');
 
 // Display products
 function displayProducts(productsToShow) {
@@ -209,7 +211,7 @@ searchInput.addEventListener('input', (e) => {
 });
 
 cartBtn.addEventListener('click', () => {
-    window.open('cart.html', '_blank');
+    loadCartPage();
 });
 
 closeCartBtn.addEventListener('click', () => {
@@ -269,12 +271,12 @@ backHomeBtn.addEventListener('click', () => {
 });
 
 ordersBtn.addEventListener('click', () => {
-    window.open('orders.html', '_blank');
+    loadOrdersPage();
 });
 
 // CEO image click functionality
 ceoImage.addEventListener('click', () => {
-    window.open('ceo.html', '_blank');
+    ceoModal.classList.remove('hidden');
 });
 
 // Modal close functionality
@@ -297,6 +299,12 @@ loginModal.addEventListener('click', (e) => {
 registerModal.addEventListener('click', (e) => {
     if (e.target === registerModal) {
         registerModal.classList.add('hidden');
+    }
+});
+
+ceoModal.addEventListener('click', (e) => {
+    if (e.target === ceoModal) {
+        ceoModal.classList.add('hidden');
     }
 });
 
@@ -405,6 +413,36 @@ async function loadProducts() {
             { id: 9, name: "Uji Recipe Book", price: 250, image: "src/images/tradi.jpeg", category: "Books" }
         ];
         displayProducts(products);
+    }
+}
+
+// Load cart page content
+async function loadCartPage() {
+    try {
+        const response = await fetch('cart.html');
+        const html = await response.text();
+        mainContent.innerHTML = html;
+        // Execute cart.js script
+        const script = document.createElement('script');
+        script.src = 'cart.js';
+        document.body.appendChild(script);
+    } catch (error) {
+        console.error('Failed to load cart page:', error);
+    }
+}
+
+// Load orders page content
+async function loadOrdersPage() {
+    try {
+        const response = await fetch('orders.html');
+        const html = await response.text();
+        mainContent.innerHTML = html;
+        // Execute orders.js script
+        const script = document.createElement('script');
+        script.src = 'orders.js';
+        document.body.appendChild(script);
+    } catch (error) {
+        console.error('Failed to load orders page:', error);
     }
 }
 

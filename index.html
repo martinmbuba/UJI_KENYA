@@ -22,61 +22,74 @@
             <button id="orders-btn">My Orders</button>
         </div>
     </header>
-    <main>
-        <section id="ceo-message" class="ceo-message">
-            <h2>A Word from Our CEO</h2>
-            <p>"At UJI Kenya, we're passionate about bringing the authentic taste of traditional Kenyan Uji to homes around the world. Our carefully sourced ingredients and time-honored recipes ensure every bowl of Uji is a celebration of Kenyan culture and nutrition. Join us in preserving this beloved tradition while embracing modern convenience."</p>
-            <cite>- Carol Kathomi Mbuba, CEO, UJI Kenya</cite>
-            <div id="floating-message" class="floating-message hidden">Added to cart!</div>
-        </section>
-        <div id="products" class="product-grid"></div>
-        <div class="pagination">
-            <button id="back-home-btn" class="pagination-btn back-home-btn hidden">Back to Home</button>
-            <button id="next-btn" class="pagination-btn">Next</button>
-        </div>
-        <div id="cart" class="cart">
-            <h2>Shopping Cart</h2>
-            <ul id="cart-items"></ul>
-            <div class="cart-total">
-                <p>Total: Ksh <span id="cart-total">0</span></p>
+    <div id="main-content">
+        <main>
+            <section id="ceo-message" class="ceo-message">
+                <h2>A Word from Our CEO</h2>
+                <p>"At UJI Kenya, we're passionate about bringing the authentic taste of traditional Kenyan Uji to homes around the world. Our carefully sourced ingredients and time-honored recipes ensure every bowl of Uji is a celebration of Kenyan culture and nutrition. Join us in preserving this beloved tradition while embracing modern convenience."</p>
+                <cite>- Carol Kathomi Mbuba, CEO, UJI Kenya</cite>
+                <div id="floating-message" class="floating-message hidden">Added to cart!</div>
+            </section>
+            <div id="products" class="product-grid"></div>
+            <div class="pagination">
+                <button id="back-home-btn" class="pagination-btn back-home-btn hidden">Back to Home</button>
+                <button id="next-btn" class="pagination-btn">Next</button>
             </div>
-            <div class="cart-buttons">
-                <button id="checkout-btn">Checkout</button>
-                <button id="close-cart">Close</button>
+            <div id="cart" class="cart">
+                <h2>Shopping Cart</h2>
+                <ul id="cart-items"></ul>
+                <div class="cart-total">
+                    <p>Total: Ksh <span id="cart-total">0</span></p>
+                </div>
+                <div class="cart-buttons">
+                    <button id="checkout-btn">Checkout</button>
+                    <button id="close-cart">Close</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Login Modal -->
-        <div id="login-modal" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal" data-modal="login-modal">&times;</span>
-                <h2>Login</h2>
-                <form id="login-form">
-                    <input type="email" id="login-email" placeholder="Email" required>
-                    <input type="password" id="login-password" placeholder="Password" required>
-                    <button type="submit">Login</button>
-                    <button type="button" id="cancel-login">Cancel</button>
-                </form>
-                <p>Don't have an account? <a href="#" id="switch-to-register">Register here</a></p>
+            <!-- Login Modal -->
+            <div id="login-modal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close-modal" data-modal="login-modal">&times;</span>
+                    <h2>Login</h2>
+                    <form id="login-form">
+                        <input type="email" id="login-email" placeholder="Email" required>
+                        <input type="password" id="login-password" placeholder="Password" required>
+                        <button type="submit">Login</button>
+                        <button type="button" id="cancel-login">Cancel</button>
+                    </form>
+                    <p>Don't have an account? <a href="#" id="switch-to-register">Register here</a></p>
+                </div>
             </div>
-        </div>
 
-        <!-- Register Modal -->
-        <div id="register-modal" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal" data-modal="register-modal">&times;</span>
-                <h2>Register</h2>
-                <form id="register-form">
-                    <input type="text" id="register-name" placeholder="Full Name" required>
-                    <input type="email" id="register-email" placeholder="Email" required>
-                    <input type="password" id="register-password" placeholder="Password" required>
-                    <button type="submit">Register</button>
-                    <button type="button" id="cancel-register">Cancel</button>
-                </form>
-                <p>Already have an account? <a href="#" id="switch-to-login">Login here</a></p>
+            <!-- Register Modal -->
+            <div id="register-modal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close-modal" data-modal="register-modal">&times;</span>
+                    <h2>Register</h2>
+                    <form id="register-form">
+                        <input type="text" id="register-name" placeholder="Full Name" required>
+                        <input type="email" id="register-email" placeholder="Email" required>
+                        <input type="password" id="register-password" placeholder="Password" required>
+                        <button type="submit">Register</button>
+                        <button type="button" id="cancel-register">Cancel</button>
+                    </form>
+                    <p>Already have an account? <a href="#" id="switch-to-login">Login here</a></p>
+                </div>
             </div>
-        </div>
 
+            <!-- CEO Modal -->
+            <div id="ceo-modal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close-modal" data-modal="ceo-modal">&times;</span>
+                    <img src="src/images/CEO.jpeg" alt="CEO" class="modal-ceo-image">
+                    <h2>Carol Kathomi Mbuba</h2>
+                    <p>CEO of UJI Kenya</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
     <footer>
         <div class="footer-content">
             <div class="footer-section">

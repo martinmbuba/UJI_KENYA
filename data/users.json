@@ -19,5 +19,12 @@
     "email": "MBUBA@GMAIL.COM",
     "password": "$2b$10$wUITOYczcLrnBk3j3zlVUOBnRxGEG.8b8OEQCESpJyyfvkurBr7A6",
     "createdAt": "2025-11-02T04:35:20.598Z"
+  },
+  {
+    "id": 1762058797131,
+    "name": "martin mbuba",
+    "email": "mbuba@gmail.com",
+    "password": "$2b$10$bGuMJACd28rNvRNqhdtjjusl5mJ1JQZb/DLYWy9YJ0qJQqs/ja5Rq",
+    "createdAt": "2025-11-02T04:46:37.131Z"
   }
 ]
