@@ -4,13 +4,6 @@ let orders = [];
 // DOM elements
 const ordersList = document.getElementById('orders-list');
 const noOrders = document.getElementById('no-orders');
-const ceoImage = document.querySelector('.ceo-image');
-const registerBtn = document.getElementById('register-btn');
-const loginBtn = document.getElementById('login-btn');
-const backHomeContentBtn = document.getElementById('back-home-content-btn');
-const cartBtn = document.getElementById('cart-btn');
-const ordersBtn = document.getElementById('orders-btn');
-const cartCount = document.getElementById('cart-count');
 const loginModal = document.getElementById('login-modal');
 const registerModal = document.getElementById('register-modal');
 const loginForm = document.getElementById('login-form');
@@ -88,11 +81,9 @@ function formatDate(dateString) {
     });
 }
 
-// Update cart count
+// Update cart count (no longer needed since header is removed)
 function updateCartCount() {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.textContent = totalItems;
+    // Cart count is no longer displayed on this page
 }
 
 // Reorder functionality
@@ -145,33 +136,16 @@ ordersList.addEventListener('click', (e) => {
     }
 });
 
-// CEO image click functionality
-ceoImage.addEventListener('click', () => {
-    window.open('ceo.html', '_blank');
-});
-
-// Auth button functionality
-registerBtn.addEventListener('click', () => {
-    registerModal.classList.remove('hidden');
-});
-
-loginBtn.addEventListener('click', () => {
-    loginModal.classList.remove('hidden');
-});
-
 // Navigation buttons
 document.addEventListener('click', (e) => {
     if (e.target.id === 'back-home-content-btn') {
         window.location.href = 'index.html';
-    } else if (e.target.id === 'cart-btn') {
-        window.open('cart.html', '_blank');
-    } else if (e.target.id === 'orders-btn') {
-        // Already on orders page, could refresh or do nothing
-        displayOrders();
     } else if (e.target.id === 'start-shopping-btn') {
         window.location.href = 'index.html';
     }
 });
+
+// Auth button functionality (removed since header is gone)
 
 // Modal close functionality
 document.addEventListener('click', (e) => {
@@ -266,28 +240,9 @@ function showFloatingMessage(message) {
     }, 3000);
 }
 
-// Update auth UI function
+// Update auth UI function (removed since header is gone)
 function updateAuthUI(isLoggedIn) {
-    const registerBtn = document.getElementById('register-btn');
-    const loginBtn = document.getElementById('login-btn');
-
-    if (isLoggedIn) {
-        registerBtn.style.display = 'none';
-        loginBtn.textContent = 'Logout';
-        loginBtn.onclick = () => {
-            api.logout();
-            updateAuthUI(false);
-            orders = []; // Clear orders on logout
-            displayOrders();
-            showFloatingMessage('Logged out successfully');
-        };
-    } else {
-        registerBtn.style.display = 'block';
-        loginBtn.textContent = 'Login';
-        loginBtn.onclick = () => {
-            loginModal.classList.remove('hidden');
-        };
-    }
+    // Auth UI is no longer displayed on this page
 }
 
 // Load orders from API
@@ -311,5 +266,3 @@ async function loadOrders() {
 
 // Initialize
 loadOrders();
-updateCartCount();
-updateAuthUI(api.isLoggedIn());

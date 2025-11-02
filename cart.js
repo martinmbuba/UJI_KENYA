@@ -7,16 +7,9 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 // DOM elements
 const cartItems = document.getElementById('cart-items');
 const cartTotal = document.getElementById('cart-total');
-const cartCount = document.getElementById('cart-count');
 const emptyCart = document.getElementById('empty-cart');
 const cartContent = document.getElementById('cart-content');
 const checkoutBtn = document.getElementById('checkout-btn');
-const ceoImage = document.querySelector('.ceo-image');
-const registerBtn = document.getElementById('register-btn');
-const loginBtn = document.getElementById('login-btn');
-const backHomeBtn = document.getElementById('back-home-btn');
-const cartBtn = document.getElementById('cart-btn');
-const ordersBtn = document.getElementById('orders-btn');
 const loginModal = document.getElementById('login-modal');
 const registerModal = document.getElementById('register-modal');
 const loginForm = document.getElementById('login-form');
@@ -69,10 +62,9 @@ function displayCart() {
     updateCartCount();
 }
 
-// Update cart count in header
+// Update cart count (no longer needed since header is removed)
 function updateCartCount() {
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartCount.textContent = totalItems;
+    // Cart count is no longer displayed on this page
 }
 
 // Increase quantity
@@ -161,33 +153,16 @@ checkoutBtn.addEventListener('click', async () => {
     }
 });
 
-// CEO image click functionality
-ceoImage.addEventListener('click', () => {
-    window.open('ceo.html', '_blank');
-});
-
 // Navigation buttons
 document.addEventListener('click', (e) => {
     if (e.target.id === 'back-home-btn') {
         window.location.href = 'index.html';
-    } else if (e.target.id === 'cart-btn') {
-        // Already on cart page, could refresh or do nothing
-        displayCart();
-    } else if (e.target.id === 'orders-btn') {
-        window.open('orders.html', '_blank');
     } else if (e.target.id === 'continue-shopping-btn') {
         window.location.href = 'index.html';
     }
 });
 
-// Auth button functionality
-registerBtn.addEventListener('click', () => {
-    registerModal.classList.remove('hidden');
-});
-
-loginBtn.addEventListener('click', () => {
-    loginModal.classList.remove('hidden');
-});
+// Auth button functionality (removed since header is gone)
 
 // Modal close functionality
 document.addEventListener('click', (e) => {
@@ -280,26 +255,9 @@ function showFloatingMessage(message) {
     }, 3000);
 }
 
-// Update auth UI function
+// Update auth UI function (removed since header is gone)
 function updateAuthUI(isLoggedIn) {
-    const registerBtn = document.getElementById('register-btn');
-    const loginBtn = document.getElementById('login-btn');
-
-    if (isLoggedIn) {
-        registerBtn.style.display = 'none';
-        loginBtn.textContent = 'Logout';
-        loginBtn.onclick = () => {
-            api.logout();
-            updateAuthUI(false);
-            showFloatingMessage('Logged out successfully');
-        };
-    } else {
-        registerBtn.style.display = 'block';
-        loginBtn.textContent = 'Login';
-        loginBtn.onclick = () => {
-            loginModal.classList.remove('hidden');
-        };
-    }
+    // Auth UI is no longer displayed on this page
 }
 
 // Load products from API
@@ -327,4 +285,3 @@ async function loadProducts() {
 // Initialize
 loadProducts();
 displayCart();
-updateAuthUI(api.isLoggedIn());
