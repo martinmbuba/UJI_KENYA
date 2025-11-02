@@ -1,5 +1,5 @@
-// Load orders from localStorage
-let orders = JSON.parse(localStorage.getItem('orders')) || [];
+// Orders data (will be loaded from API)
+let orders = [];
 
 // DOM elements
 const ordersList = document.getElementById('orders-list');
@@ -96,33 +96,40 @@ function updateCartCount() {
 }
 
 // Reorder functionality
-function reorder(orderId) {
+async function reorder(orderId) {
     const order = orders.find(o => o.id === orderId);
     if (order) {
-        // Create a new order with the same items
-        const newOrder = {
-            id: Date.now(), // Generate new order ID
-            items: [...order.items], // Copy items
-            total: order.total,
-            date: new Date().toISOString(),
-            status: 'Pending'
-        };
-        orders.push(newOrder);
-        localStorage.setItem('orders', JSON.stringify(orders));
-        displayOrders(); // Refresh the orders display
-        showFloatingMessage(`Order reordered successfully! New order #${newOrder.id} placed.`);
+        try {
+            // Create a new order via API
+            const orderData = {
+                items: order.items.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image
+                })),
+                total: order.total
+            };
+
+            const response = await api.createOrder(orderData);
+            showFloatingMessage(`Order reordered successfully! New order #${response.order.id} placed.`);
+            loadOrders(); // Refresh orders from API
+        } catch (error) {
+            showFloatingMessage(error.message || 'Reorder failed');
+        }
     }
 }
 
 // Cancel order functionality
-function cancelOrder(orderId) {
+async function cancelOrder(orderId) {
     if (confirm('Are you sure you want to cancel this order?')) {
-        const orderIndex = orders.findIndex(o => o.id === orderId);
-        if (orderIndex !== -1) {
-            orders[orderIndex].status = 'Cancelled';
-            localStorage.setItem('orders', JSON.stringify(orders));
-            displayOrders();
+        try {
+            await api.updateOrder(orderId, { status: 'Cancelled' });
             showFloatingMessage('Order cancelled successfully.');
+            loadOrders(); // Refresh orders from API
+        } catch (error) {
+            showFloatingMessage(error.message || 'Cancel failed');
         }
     }
 }
@@ -214,28 +221,38 @@ switchToLogin.addEventListener('click', (e) => {
 });
 
 // Form submissions
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
-    if (email && password) {
-        showFloatingMessage('Login successful! Welcome back.');
+    try {
+        const response = await api.login({ email, password });
+        showFloatingMessage(response.message);
         loginModal.classList.add('hidden');
         loginForm.reset();
+        updateAuthUI(true);
+        loadOrders(); // Load orders after login
+    } catch (error) {
+        showFloatingMessage(error.message || 'Login failed');
     }
 });
 
-registerForm.addEventListener('submit', (e) => {
+registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('register-name').value;
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
 
-    if (name && email && password) {
-        showFloatingMessage('Registration successful! Welcome to UJI Kenya.');
+    try {
+        const response = await api.register({ name, email, password });
+        showFloatingMessage(response.message);
         registerModal.classList.add('hidden');
         registerForm.reset();
+        updateAuthUI(true);
+        loadOrders(); // Load orders after registration
+    } catch (error) {
+        showFloatingMessage(error.message || 'Registration failed');
     }
 });
 
@@ -249,6 +266,50 @@ function showFloatingMessage(message) {
     }, 3000);
 }
 
+// Update auth UI function
+function updateAuthUI(isLoggedIn) {
+    const registerBtn = document.getElementById('register-btn');
+    const loginBtn = document.getElementById('login-btn');
+
+    if (isLoggedIn) {
+        registerBtn.style.display = 'none';
+        loginBtn.textContent = 'Logout';
+        loginBtn.onclick = () => {
+            api.logout();
+            updateAuthUI(false);
+            orders = []; // Clear orders on logout
+            displayOrders();
+            showFloatingMessage('Logged out successfully');
+        };
+    } else {
+        registerBtn.style.display = 'block';
+        loginBtn.textContent = 'Login';
+        loginBtn.onclick = () => {
+            loginModal.classList.remove('hidden');
+        };
+    }
+}
+
+// Load orders from API
+async function loadOrders() {
+    if (!api.isLoggedIn()) {
+        orders = [];
+        displayOrders();
+        return;
+    }
+
+    try {
+        const response = await api.getOrders();
+        orders = response.orders;
+        displayOrders();
+    } catch (error) {
+        console.error('Failed to load orders:', error);
+        orders = [];
+        displayOrders();
+    }
+}
+
 // Initialize
-displayOrders();
+loadOrders();
 updateCartCount();
+updateAuthUI(api.isLoggedIn());

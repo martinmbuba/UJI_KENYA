@@ -1,17 +1,6 @@
-// Mock product data
-const products = [
-    { id: 1, name: "UJI BOWL", price: 150, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.09.12.jpeg", category: "Uji" },
-    { id: 2, name: "Sweet Uji Powder", price: 320, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.09.36.jpeg", category: "Uji" },
-    { id: 3, name: "Uji Bowl Set", price: 650, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.09.59.jpeg", category: "Accessories" },
-    { id: 4, name: "Maize Flour for Uji", price: 220, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.10.32.jpeg", category: "Ingredients" },
-    { id: 5, name: "Uji Stirring Stick", price: 100, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.11.05.jpeg", category: "Tools" },
-    { id: 6, name: "Flavored Uji Sachets", price: 390, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.11.21.jpeg", category: "Uji" },
-    { id: 7, name: "Uji Milk Additive", price: 120, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.12.04.jpeg", category: "Ingredients" },
-    { id: 8, name: "Traditional Uji Pot", price: 780, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.13.55.jpeg", category: "Tools" },
-    { id: 9, name: "Uji Recipe Book", price: 250, image: "src/images/tradi.jpeg", category: "Books" }
-];
-
-let cart = [];
+// Global variables
+let products = [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let currentPage = parseInt(localStorage.getItem('currentPage')) || 1;
 const itemsPerPage = 6;
 const productQuantities = new Map();
@@ -227,15 +216,38 @@ closeCartBtn.addEventListener('click', () => {
     cartDiv.classList.remove('show');
 });
 
-checkoutBtn.addEventListener('click', () => {
+checkoutBtn.addEventListener('click', async () => {
     if (cart.length === 0) {
-    showFloatingMessage('Your cart is empty. Add some products first!');
+        showFloatingMessage('Your cart is empty. Add some products first!');
         return;
     }
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    showFloatingMessage(`Checkout successful! Total amount: Ksh ${total}. Thank you for shopping with UJI Kenya!`);
-    cart = [];
-    updateCart();
+
+    if (!api.isLoggedIn()) {
+        showFloatingMessage('Please login to checkout');
+        loginModal.classList.remove('hidden');
+        return;
+    }
+
+    try {
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const orderData = {
+            items: cart.map(item => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                image: item.image
+            })),
+            total
+        };
+
+        const response = await api.createOrder(orderData);
+        showFloatingMessage(`Checkout successful! Order #${response.order.id} placed. Total: Ksh ${total}`);
+        cart = [];
+        updateCart();
+    } catch (error) {
+        showFloatingMessage(error.message || 'Checkout failed');
+    }
 });
 
 registerBtn.addEventListener('click', () => {
@@ -313,35 +325,90 @@ switchToLogin.addEventListener('click', (e) => {
 });
 
 // Form submissions
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
-    // Simple validation (in a real app, this would be server-side)
-    if (email && password) {
-        showFloatingMessage('Login successful! Welcome back.');
+    try {
+        const response = await api.login({ email, password });
+        showFloatingMessage(response.message);
         loginModal.classList.add('hidden');
         loginForm.reset();
+        // Update UI to show logged in state
+        updateAuthUI(true);
+    } catch (error) {
+        showFloatingMessage(error.message || 'Login failed');
     }
 });
 
-registerForm.addEventListener('submit', (e) => {
+registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('register-name').value;
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
 
-    // Simple validation (in a real app, this would be server-side)
-    if (name && email && password) {
-        showFloatingMessage('Registration successful! Welcome to UJI Kenya.');
+    try {
+        const response = await api.register({ name, email, password });
+        showFloatingMessage(response.message);
         registerModal.classList.add('hidden');
         registerForm.reset();
+        // Update UI to show logged in state
+        updateAuthUI(true);
+    } catch (error) {
+        showFloatingMessage(error.message || 'Registration failed');
     }
 });
 
 
 
+// Update auth UI function
+function updateAuthUI(isLoggedIn) {
+    const registerBtn = document.getElementById('register-btn');
+    const loginBtn = document.getElementById('login-btn');
+
+    if (isLoggedIn) {
+        registerBtn.style.display = 'none';
+        loginBtn.textContent = 'Logout';
+        loginBtn.onclick = () => {
+            api.logout();
+            updateAuthUI(false);
+            showFloatingMessage('Logged out successfully');
+        };
+    } else {
+        registerBtn.style.display = 'block';
+        loginBtn.textContent = 'Login';
+        loginBtn.onclick = () => {
+            loginModal.classList.remove('hidden');
+        };
+    }
+}
+
+// Load products from API
+async function loadProducts() {
+    try {
+        const response = await api.getProducts();
+        products = response.products;
+        displayProducts(products);
+    } catch (error) {
+        console.error('Failed to load products:', error);
+        // Fallback to local products if API fails
+        products = [
+            { id: 1, name: "UJI BOWL", price: 150, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.09.12.jpeg", category: "Uji" },
+            { id: 2, name: "Sweet Uji Powder", price: 320, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.09.36.jpeg", category: "Uji" },
+            { id: 3, name: "Uji Bowl Set", price: 650, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.09.59.jpeg", category: "Accessories" },
+            { id: 4, name: "Maize Flour for Uji", price: 220, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.10.32.jpeg", category: "Ingredients" },
+            { id: 5, name: "Uji Stirring Stick", price: 100, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.11.05.jpeg", category: "Tools" },
+            { id: 6, name: "Flavored Uji Sachets", price: 390, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.11.21.jpeg", category: "Uji" },
+            { id: 7, name: "Uji Milk Additive", price: 120, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.12.04.jpeg", category: "Ingredients" },
+            { id: 8, name: "Traditional Uji Pot", price: 780, image: "src/images/WhatsApp%20Image%202025-11-01%20at%2023.13.55.jpeg", category: "Tools" },
+            { id: 9, name: "Uji Recipe Book", price: 250, image: "src/images/tradi.jpeg", category: "Books" }
+        ];
+        displayProducts(products);
+    }
+}
+
 // Initialize
-displayProducts(products);
+loadProducts();
 cartDiv.classList.add('hidden');
+updateAuthUI(api.isLoggedIn());

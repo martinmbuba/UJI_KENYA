@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1762057652070,
+    "name": "martin mbuba",
+    "email": "martin@gmail.com",
+    "password": "$2b$10$x7WvESDVPNR.qjY8n7RnBu7.DjhiE.VHyYm5/V1DV4/QC8gOC1HfW",
+    "createdAt": "2025-11-02T04:27:32.070Z"
+  },
+  {
+    "id": 1762057695719,
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2b$10$5F6o8Arr14QCIlWIdYNDherfcLLpis3SWG3R5wD2GuprBAa4ev362",
+    "createdAt": "2025-11-02T04:28:15.719Z"
+  },
+  {
+    "id": 1762058120598,
+    "name": "martin mbuba",
+    "email": "MBUBA@GMAIL.COM",
+    "password": "$2b$10$wUITOYczcLrnBk3j3zlVUOBnRxGEG.8b8OEQCESpJyyfvkurBr7A6",
+    "createdAt": "2025-11-02T04:35:20.598Z"
+  }
+]
