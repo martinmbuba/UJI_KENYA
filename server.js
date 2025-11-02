@@ -44,6 +44,12 @@ app.get('/orders.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'orders.html'));
 });
 
+// Serve images from src/images directory
+app.get('/src/images/:imageName', (req, res) => {
+    const imageName = req.params.imageName;
+    res.sendFile(path.join(__dirname, 'src', 'images', imageName));
+});
+
 // Data storage (in production, use a database)
 let users = [];
 let orders = [];
