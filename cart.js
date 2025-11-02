@@ -1,8 +1,152 @@
 // Products will be loaded from API
 let products = [];
 
-// Use global cart from window object
-let cart = window.cart || [];
+// Prevent double-initialization when the script is loaded multiple times
+if (window._cartInit) {
+    // Re-render cart in case content was replaced
+    displayCart();
+} else {
+    window._cartInit = true;
+
+    // Event listeners
+    cartItems.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-item')) {
+            const productId = parseInt(e.target.dataset.id);
+            removeFromCart(productId);
+        } else if (e.target.classList.contains('quantity-btn')) {
+            const productId = parseInt(e.target.dataset.id);
+            if (e.target.classList.contains('increase')) {
+                increaseQuantity(productId);
+            } else if (e.target.classList.contains('decrease')) {
+                decreaseQuantity(productId);
+            }
+        }
+    });
+
+    checkoutBtn.addEventListener('click', async () => {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (cart.length === 0) {
+            showFloatingMessage('Your cart is empty. Add some products first!');
+            return;
+        }
+
+        if (!api.isLoggedIn()) {
+            showFloatingMessage('Please login to checkout');
+            loginModal.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const orderData = {
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image
+                })),
+                total
+            };
+
+            const response = await api.createOrder(orderData);
+            showFloatingMessage(`Checkout successful! Order #${response.order.id} placed. Total: Ksh ${total}`);
+            localStorage.setItem('cart', JSON.stringify([]));
+            displayCart();
+        } catch (error) {
+            showFloatingMessage(error.message || 'Checkout failed');
+        }
+    });
+
+    // Navigation buttons
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'back-home-btn') {
+            history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+            location.reload();
+        } else if (e.target.id === 'continue-shopping-btn') {
+            history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+            location.reload();
+        }
+    });
+
+    // Modal close and auth handlers
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('close-modal')) {
+            const modalId = e.target.getAttribute('data-modal');
+            if (modalId) {
+                document.getElementById(modalId).classList.add('hidden');
+            }
+        }
+    });
+
+    loginModal.addEventListener('click', (e) => {
+        if (e.target === loginModal) {
+            loginModal.classList.add('hidden');
+        }
+    });
+
+    registerModal.addEventListener('click', (e) => {
+        if (e.target === registerModal) {
+            registerModal.classList.add('hidden');
+        }
+    });
+
+    cancelLogin.addEventListener('click', () => {
+        loginModal.classList.add('hidden');
+        loginForm.reset();
+    });
+
+    cancelRegister.addEventListener('click', () => {
+        registerModal.classList.add('hidden');
+        registerForm.reset();
+    });
+
+    switchToRegister.addEventListener('click', (e) => {
+        e.preventDefault();
+        loginModal.classList.add('hidden');
+        registerModal.classList.remove('hidden');
+    });
+
+    switchToLogin.addEventListener('click', (e) => {
+        e.preventDefault();
+        registerModal.classList.add('hidden');
+        loginModal.classList.remove('hidden');
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+            const response = await api.login({ email, password });
+            showFloatingMessage(response.message);
+            loginModal.classList.add('hidden');
+            loginForm.reset();
+            updateAuthUI(true);
+        } catch (error) {
+            showFloatingMessage(error.message || 'Login failed');
+        }
+    });
+
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+
+        try {
+            const response = await api.register({ name, email, password });
+            showFloatingMessage(response.message);
+            registerModal.classList.add('hidden');
+            registerForm.reset();
+            updateAuthUI(true);
+        } catch (error) {
+            showFloatingMessage(error.message || 'Registration failed');
+        }
+    });
+
+}
 
 // DOM elements
 const cartItems = document.getElementById('cart-items');
@@ -21,6 +165,7 @@ const cancelRegister = document.getElementById('cancel-register');
 
 // Display cart items
 function displayCart() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
     cartItems.innerHTML = '';
     let total = 0;
 
@@ -62,32 +207,29 @@ function displayCart() {
     updateCartCount();
 }
 
-// Update cart count (no longer needed since header is removed)
-function updateCartCount() {
-    // Cart count is no longer displayed on this page
-}
+
 
 // Increase quantity
 function increaseQuantity(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const item = cart.find(item => item.id === productId);
     if (item) {
         item.quantity++;
-        window.cart = cart; // Update global cart
-        saveCart();
+        saveCart(cart);
         displayCart();
     }
 }
 
 // Decrease quantity
 function decreaseQuantity(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const item = cart.find(item => item.id === productId);
     if (item) {
         item.quantity--;
         if (item.quantity <= 0) {
             removeFromCart(productId);
         } else {
-            window.cart = cart; // Update global cart
-            saveCart();
+            saveCart(cart);
             displayCart();
         }
     }
@@ -95,14 +237,14 @@ function decreaseQuantity(productId) {
 
 // Remove from cart
 function removeFromCart(productId) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
     cart = cart.filter(item => item.id !== productId);
-    window.cart = cart; // Update global cart
-    saveCart();
+    saveCart(cart);
     displayCart();
 }
 
 // Save cart to localStorage
-function saveCart() {
+function saveCart(cart) {
     localStorage.setItem('cart', JSON.stringify(cart));
 }
 
@@ -122,6 +264,7 @@ cartItems.addEventListener('click', (e) => {
 });
 
 checkoutBtn.addEventListener('click', async () => {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
     if (cart.length === 0) {
         showFloatingMessage('Your cart is empty. Add some products first!');
         return;
@@ -148,9 +291,7 @@ checkoutBtn.addEventListener('click', async () => {
 
         const response = await api.createOrder(orderData);
         showFloatingMessage(`Checkout successful! Order #${response.order.id} placed. Total: Ksh ${total}`);
-        cart = [];
-        window.cart = cart; // Update global cart
-        saveCart();
+        localStorage.setItem('cart', JSON.stringify([]));
         displayCart();
     } catch (error) {
         showFloatingMessage(error.message || 'Checkout failed');
@@ -161,14 +302,16 @@ checkoutBtn.addEventListener('click', async () => {
 document.addEventListener('click', (e) => {
     if (e.target.id === 'back-home-btn') {
         // Load home page content
-        window.location.href = '/';
+        history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+        location.reload();
     } else if (e.target.id === 'continue-shopping-btn') {
         // Load home page content
-        window.location.href = '/';
+        history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+        location.reload();
     }
 });
 
-// Auth button functionality (removed since header is gone)
+
 
 // Modal close functionality
 document.addEventListener('click', (e) => {
@@ -261,9 +404,35 @@ function showFloatingMessage(message) {
     }, 3000);
 }
 
-// Update auth UI function (removed since header is gone)
+// Update cart count
+function updateCartCount() {
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+}
+
+// Update auth UI function
 function updateAuthUI(isLoggedIn) {
-    // Auth UI is no longer displayed on this page
+    const registerBtn = document.getElementById('register-btn');
+    const loginBtn = document.getElementById('login-btn');
+
+    if (isLoggedIn) {
+        registerBtn.style.display = 'none';
+        loginBtn.textContent = 'Logout';
+        loginBtn.onclick = () => {
+            api.logout();
+            updateAuthUI(false);
+            showFloatingMessage('Logged out successfully');
+        };
+    } else {
+        registerBtn.style.display = 'block';
+        loginBtn.textContent = 'Login';
+        loginBtn.onclick = () => {
+            loginModal.classList.remove('hidden');
+        };
+    }
 }
 
 // Load products from API
@@ -288,4 +457,10 @@ async function loadProducts() {
     }
 }
 
-// Initialize (called from script.js after page load)
+// Initialize cart page
+displayCart();
+loadProducts();
+updateAuthUI(api.isLoggedIn());
+
+// Update cart count periodically
+setInterval(updateCartCount, 1000);

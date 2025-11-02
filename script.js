@@ -1,6 +1,5 @@
 // Global variables
 let products = [];
-window.cart = JSON.parse(localStorage.getItem('cart')) || [];
 let currentPage = parseInt(localStorage.getItem('currentPage')) || 1;
 const itemsPerPage = 6;
 const productQuantities = new Map();
@@ -32,6 +31,59 @@ const cancelLogin = document.getElementById('cancel-login');
 const cancelRegister = document.getElementById('cancel-register');
 const ceoModal = document.getElementById('ceo-modal');
 const ceoImage = document.querySelector('.ceo-image');
+// Use delegated document handler for header actions (works across SPA navigation)
+document.addEventListener('click', (e) => {
+    const el = e.target.closest('button, a');
+    if (!el) return;
+    const id = el.id;
+
+    if (id === 'cart-btn') {
+        e.preventDefault();
+        loadCartPage();
+        return;
+    }
+
+    if (id === 'orders-btn') {
+        e.preventDefault();
+        loadOrdersPage();
+        return;
+    }
+
+    if (id === 'next-btn') {
+        e.preventDefault();
+        currentPage++;
+        displayProducts(products);
+        return;
+    }
+
+    if (id === 'back-home-btn' || id === 'back-home-content-btn') {
+        e.preventDefault();
+        currentPage = 1;
+        displayProducts(products);
+        history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+        return;
+    }
+
+    if (id === 'register-btn') {
+        e.preventDefault();
+        const reg = document.getElementById('register-modal');
+        if (reg) reg.classList.remove('hidden');
+        return;
+    }
+
+    if (id === 'login-btn') {
+        e.preventDefault();
+        if (api.isLoggedIn()) {
+            api.logout();
+            updateAuthUI(false);
+            showFloatingMessage('Logged out successfully');
+        } else {
+            const lm = document.getElementById('login-modal');
+            if (lm) lm.classList.remove('hidden');
+        }
+        return;
+    }
+});
 
 // Display products
 function displayProducts(productsToShow) {
@@ -63,63 +115,76 @@ function displayProducts(productsToShow) {
 // Add to cart
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
-    const existingItem = window.cart.find(item => item.id === productId);
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingItem = cart.find(item => item.id === productId);
 
     if (existingItem) {
         existingItem.quantity++;
     } else {
-        window.cart.push({ ...product, quantity: 1 });
+        cart.push({ ...product, quantity: 1 });
     }
 
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCart();
     showFloatingMessage();
 }
 
 // Increase quantity
 function increaseQuantity(productId) {
-    const item = window.cart.find(item => item.id === productId);
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const item = cart.find(item => item.id === productId);
     if (item) {
         item.quantity++;
+        localStorage.setItem('cart', JSON.stringify(cart));
         updateCart();
     }
 }
 
 // Decrease quantity
 function decreaseQuantity(productId) {
-    const item = window.cart.find(item => item.id === productId);
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const item = cart.find(item => item.id === productId);
     if (item) {
         item.quantity--;
         if (item.quantity <= 0) {
             removeFromCart(productId);
         } else {
+            localStorage.setItem('cart', JSON.stringify(cart));
             updateCart();
         }
     }
 }
 
-// Show floating message
-function showFloatingMessage() {
-    const message = document.getElementById('floating-message');
-    message.classList.remove('hidden');
-    setTimeout(() => {
-        message.classList.add('hidden');
+// Show floating message (accepts an optional message)
+function showFloatingMessage(text) {
+    const messageEl = document.getElementById('floating-message');
+    if (!messageEl) return;
+    if (typeof text === 'string') messageEl.textContent = text;
+    // If no explicit text provided, leave existing text (default in HTML)
+    messageEl.classList.remove('hidden');
+    clearTimeout(showFloatingMessage._timeout);
+    showFloatingMessage._timeout = setTimeout(() => {
+        messageEl.classList.add('hidden');
     }, 3000);
 }
 
 // Remove from cart
 function removeFromCart(productId) {
-    window.cart = window.cart.filter(item => item.id !== productId);
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart = cart.filter(item => item.id !== productId);
+    localStorage.setItem('cart', JSON.stringify(cart));
     updateCart();
 }
 
 // Update cart display
 function updateCart() {
-    cartCount.textContent = window.cart.reduce((total, item) => total + item.quantity, 0);
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
 
     cartItems.innerHTML = '';
     let total = 0;
 
-    window.cart.forEach(item => {
+    cart.forEach(item => {
         const li = document.createElement('li');
         li.className = 'cart-item';
         li.innerHTML = `
@@ -138,9 +203,6 @@ function updateCart() {
     });
 
     cartTotal.textContent = total;
-
-    // Save cart to localStorage
-    localStorage.setItem('cart', JSON.stringify(window.cart));
 }
 
 // Update pagination
@@ -219,7 +281,8 @@ closeCartBtn.addEventListener('click', () => {
 });
 
 checkoutBtn.addEventListener('click', async () => {
-    if (window.cart.length === 0) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (cart.length === 0) {
         showFloatingMessage('Your cart is empty. Add some products first!');
         return;
     }
@@ -231,9 +294,9 @@ checkoutBtn.addEventListener('click', async () => {
     }
 
     try {
-        const total = window.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const orderData = {
-            items: window.cart.map(item => ({
+            items: cart.map(item => ({
                 id: item.id,
                 name: item.name,
                 price: item.price,
@@ -245,7 +308,7 @@ checkoutBtn.addEventListener('click', async () => {
 
         const response = await api.createOrder(orderData);
         showFloatingMessage(`Checkout successful! Order #${response.order.id} placed. Total: Ksh ${total}`);
-        window.cart = [];
+        localStorage.setItem('cart', JSON.stringify([]));
         updateCart();
     } catch (error) {
         showFloatingMessage(error.message || 'Checkout failed');
@@ -254,10 +317,6 @@ checkoutBtn.addEventListener('click', async () => {
 
 registerBtn.addEventListener('click', () => {
     registerModal.classList.remove('hidden');
-});
-
-loginBtn.addEventListener('click', () => {
-    loginModal.classList.remove('hidden');
 });
 
 nextBtn.addEventListener('click', () => {
@@ -423,16 +482,21 @@ async function loadCartPage() {
     try {
         const response = await fetch('cart.html');
         const html = await response.text();
-        mainContent.innerHTML = html;
-        // Execute cart.js script
+        // Parse fetched HTML and extract the cart page content
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const cartContentEl = doc.querySelector('.cart-page') || doc.querySelector('main') || doc.body;
+        if (!mainContent) return;
+        mainContent.innerHTML = cartContentEl ? cartContentEl.outerHTML : html;
+
+        // Load page-specific script (replace existing page-script if any)
+        const existing = document.getElementById('page-script');
+        if (existing) existing.remove();
         const script = document.createElement('script');
+        script.id = 'page-script';
         script.src = 'cart.js';
-        script.onload = () => {
-            // Initialize cart page after script loads
-            if (typeof loadProducts === 'function') loadProducts();
-            if (typeof displayCart === 'function') displayCart();
-        };
         document.body.appendChild(script);
+
         // Update URL without reloading
         history.pushState({ page: 'cart' }, 'Cart', '/cart');
     } catch (error) {
@@ -445,16 +509,19 @@ async function loadOrdersPage() {
     try {
         const response = await fetch('orders.html');
         const html = await response.text();
-        mainContent.innerHTML = html;
-        // Execute orders.js script
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const ordersContentEl = doc.querySelector('.orders-page') || doc.querySelector('main') || doc.body;
+        if (!mainContent) return;
+        mainContent.innerHTML = ordersContentEl ? ordersContentEl.outerHTML : html;
+
+        const existing = document.getElementById('page-script');
+        if (existing) existing.remove();
         const script = document.createElement('script');
+        script.id = 'page-script';
         script.src = 'orders.js';
-        script.onload = () => {
-            // Initialize orders page after script loads
-            if (typeof loadOrders === 'function') loadOrders();
-        };
         document.body.appendChild(script);
-        // Update URL without reloading
+
         history.pushState({ page: 'orders' }, 'Orders', '/orders');
     } catch (error) {
         console.error('Failed to load orders page:', error);
@@ -482,3 +549,6 @@ updateAuthUI(api.isLoggedIn());
 
 // Ensure cart is loaded from localStorage on page load
 updateCart();
+
+// Update cart count periodically
+setInterval(updateCart, 1000);

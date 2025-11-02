@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <header>
+        <div class="header-left">
+            <h1>UJI KENYA</h1>
+        </div>
+        <input type="text" id="search" placeholder="Search products...">
+        <div class="auth-buttons">
+            <button id="register-btn">Register</button>
+            <button id="login-btn">Login</button>
+        </div>
+        <button id="cart-btn">Cart (<span id="cart-count">0</span>)</button>
+    </header>
     <div class="orders-page">
         <h2>My Orders</h2>
 
@@ -23,6 +34,32 @@
     <div class="pagination">
         <button id="back-home-content-btn" class="back-home-btn">Back to Home</button>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>UJI Kenya</h3>
+                <p>Bringing authentic Kenyan Uji to the world</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@ujikenya.com</p>
+                <p>Phone: +254 700 123 456</p>
+                <p>Nairobi, Kenya</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <p>Facebook | Twitter | Instagram</p>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <p>Terms of Service | Privacy Policy</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 UJI Kenya. All rights reserved.</p>
+        </div>
+    </footer>
 
     <div id="floating-message" class="floating-message hidden">Message</div>
 
@@ -58,6 +95,7 @@
     </div>
 
     <script src="api.js"></script>
+    <script src="script.js"></script>
     <script src="orders.js"></script>
 </body>
 </html>

@@ -13,6 +13,13 @@ const switchToLogin = document.getElementById('switch-to-login');
 const cancelLogin = document.getElementById('cancel-login');
 const cancelRegister = document.getElementById('cancel-register');
 
+// Prevent double-initialization when the script is loaded multiple times
+if (window._ordersInit) {
+    // Re-render orders if needed
+    displayOrders();
+} else {
+    window._ordersInit = true;
+
 // Display orders
 function displayOrders() {
     ordersList.innerHTML = '';
@@ -81,10 +88,7 @@ function formatDate(dateString) {
     });
 }
 
-// Update cart count (no longer needed since header is removed)
-function updateCartCount() {
-    // Cart count is no longer displayed on this page
-}
+
 
 // Reorder functionality
 async function reorder(orderId) {
@@ -92,12 +96,13 @@ async function reorder(orderId) {
     if (order) {
         try {
             // Add items to cart
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
             order.items.forEach(item => {
-                const existingItem = window.cart.find(cartItem => cartItem.id === item.id);
+                const existingItem = cart.find(cartItem => cartItem.id === item.id);
                 if (existingItem) {
                     existingItem.quantity += item.quantity;
                 } else {
-                    window.cart.push({
+                    cart.push({
                         id: item.id,
                         name: item.name,
                         price: item.price,
@@ -108,7 +113,7 @@ async function reorder(orderId) {
             });
 
             // Save cart to localStorage
-            localStorage.setItem('cart', JSON.stringify(window.cart));
+            localStorage.setItem('cart', JSON.stringify(cart));
 
             showFloatingMessage(`Items added to cart successfully!`);
             // Navigate to cart page
@@ -147,14 +152,31 @@ ordersList.addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
     if (e.target.id === 'back-home-content-btn') {
         // Load home page content
-        window.location.href = '/';
+        history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+        location.reload();
     } else if (e.target.id === 'start-shopping-btn') {
         // Load home page content
-        window.location.href = '/';
+        history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+        location.reload();
     }
 });
 
-// Auth button functionality (removed since header is gone)
+// Update cart count on orders page
+function updateCartCount() {
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cartCount.textContent = cart.reduce((total, item) => total + item.quantity, 0);
+    }
+}
+
+// Initialize cart count
+updateCartCount();
+
+// Update cart count periodically
+setInterval(updateCartCount, 1000);
+
+
 
 // Modal close functionality
 document.addEventListener('click', (e) => {
@@ -249,9 +271,26 @@ function showFloatingMessage(message) {
     }, 3000);
 }
 
-// Update auth UI function (removed since header is gone)
+// Update auth UI function
 function updateAuthUI(isLoggedIn) {
-    // Auth UI is no longer displayed on this page
+    const registerBtn = document.getElementById('register-btn');
+    const loginBtn = document.getElementById('login-btn');
+
+    if (isLoggedIn) {
+        registerBtn.style.display = 'none';
+        loginBtn.textContent = 'Logout';
+        loginBtn.onclick = () => {
+            api.logout();
+            updateAuthUI(false);
+            showFloatingMessage('Logged out successfully');
+        };
+    } else {
+        registerBtn.style.display = 'block';
+        loginBtn.textContent = 'Login';
+        loginBtn.onclick = () => {
+            loginModal.classList.remove('hidden');
+        };
+    }
 }
 
 // Load orders from API
@@ -273,4 +312,8 @@ async function loadOrders() {
     }
 }
 
-// Initialize (called from script.js after page load)
+// Initialize orders page
+loadOrders();
+updateAuthUI(api.isLoggedIn());
+
+} // end of _ordersInit guard
