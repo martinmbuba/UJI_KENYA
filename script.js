@@ -49,6 +49,14 @@ document.addEventListener('click', (e) => {
         return;
     }
 
+    if (id === 'continue-shopping-btn') {
+        e.preventDefault();
+        currentPage = 1;
+        displayProducts(products);
+        history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+        return;
+    }
+
     if (id === 'next-btn') {
         e.preventDefault();
         currentPage++;
@@ -281,6 +289,22 @@ closeCartBtn.addEventListener('click', () => {
 });
 
 checkoutBtn.addEventListener('click', async () => {
+    // delegate to global proceedToCheckout so both direct page and SPA can use it
+    proceedToCheckout();
+});
+
+// Expose a global continueShopping so cart page buttons can call it directly
+function continueShopping(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    currentPage = 1;
+    displayProducts(products);
+    history.pushState({ page: 'home' }, 'UJI Kenya', '/');
+}
+window.continueShopping = continueShopping;
+
+// Extract checkout behavior into a reusable function available globally
+async function proceedToCheckout(e) {
+    if (e && e.preventDefault) e.preventDefault();
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     if (cart.length === 0) {
         showFloatingMessage('Your cart is empty. Add some products first!');
@@ -289,20 +313,15 @@ checkoutBtn.addEventListener('click', async () => {
 
     if (!api.isLoggedIn()) {
         showFloatingMessage('Please login to checkout');
-        loginModal.classList.remove('hidden');
+        const lm = document.getElementById('login-modal');
+        if (lm) lm.classList.remove('hidden');
         return;
     }
 
     try {
         const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
         const orderData = {
-            items: cart.map(item => ({
-                id: item.id,
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                image: item.image
-            })),
+            items: cart.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity, image: item.image })),
             total
         };
 
@@ -313,7 +332,8 @@ checkoutBtn.addEventListener('click', async () => {
     } catch (error) {
         showFloatingMessage(error.message || 'Checkout failed');
     }
-});
+}
+window.proceedToCheckout = proceedToCheckout;
 
 registerBtn.addEventListener('click', () => {
     registerModal.classList.remove('hidden');
@@ -480,7 +500,7 @@ async function loadProducts() {
 // Load cart page content
 async function loadCartPage() {
     try {
-        const response = await fetch('cart.html');
+        const response = await fetch('/cart.html');
         const html = await response.text();
         // Parse fetched HTML and extract the cart page content
         const parser = new DOMParser();
@@ -490,12 +510,13 @@ async function loadCartPage() {
         mainContent.innerHTML = cartContentEl ? cartContentEl.outerHTML : html;
 
         // Load page-specific script (replace existing page-script if any)
-        const existing = document.getElementById('page-script');
-        if (existing) existing.remove();
-        const script = document.createElement('script');
-        script.id = 'page-script';
-        script.src = 'cart.js';
-        document.body.appendChild(script);
+    const existing = document.getElementById('page-script');
+    if (existing) existing.remove();
+    const script = document.createElement('script');
+    script.id = 'page-script';
+    // Use absolute path so script loads regardless of current history path
+    script.src = '/cart.js';
+    document.body.appendChild(script);
 
         // Update URL without reloading
         history.pushState({ page: 'cart' }, 'Cart', '/cart');
@@ -507,7 +528,7 @@ async function loadCartPage() {
 // Load orders page content
 async function loadOrdersPage() {
     try {
-        const response = await fetch('orders.html');
+        const response = await fetch('/orders.html');
         const html = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
@@ -515,12 +536,13 @@ async function loadOrdersPage() {
         if (!mainContent) return;
         mainContent.innerHTML = ordersContentEl ? ordersContentEl.outerHTML : html;
 
-        const existing = document.getElementById('page-script');
-        if (existing) existing.remove();
-        const script = document.createElement('script');
-        script.id = 'page-script';
-        script.src = 'orders.js';
-        document.body.appendChild(script);
+    const existing = document.getElementById('page-script');
+    if (existing) existing.remove();
+    const script = document.createElement('script');
+    script.id = 'page-script';
+    // Use absolute path so script loads regardless of current history path
+    script.src = '/orders.js';
+    document.body.appendChild(script);
 
         history.pushState({ page: 'orders' }, 'Orders', '/orders');
     } catch (error) {

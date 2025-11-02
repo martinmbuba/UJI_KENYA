@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <script>
+        // Polyfill for extensions that reference the `browser` global (Firefox API)
+        window.browser = window.browser || window.chrome || {};
+    </script>
     <header>
         <div class="header-left">
             <h1>UJI KENYA</h1>
@@ -94,8 +98,8 @@
         </div>
     </div>
 
-    <script src="api.js"></script>
-    <script src="script.js"></script>
-    <script src="orders.js"></script>
+    <script src="/api.js"></script>
+    <script src="/script.js"></script>
+    <script src="/orders.js"></script>
 </body>
 </html>

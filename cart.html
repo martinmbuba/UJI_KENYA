@@ -1,111 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - UJI KENYA</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Cart - UJI KENYA</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <header>
-        <div class="header-left">
-            <h1>UJI KENYA</h1>
-        </div>
-        <input type="text" id="search" placeholder="Search products...">
-        <div class="auth-buttons">
-            <button id="register-btn">Register</button>
-            <button id="login-btn">Login</button>
-        </div>
-        <button id="cart-btn">Cart (<span id="cart-count">0</span>)</button>
-    </header>
-    <div class="cart-page">
-        <h2>Your Shopping Cart</h2>
+  <header>
+    <div class="header-left">
+      <h1>UJI KENYA</h1>
+    </div>
+    <input type="text" id="search" placeholder="Search products..." />
+    <div class="auth-buttons">
+      <button id="register-btn">Register</button>
+      <button id="login-btn">Login</button>
+    </div>
+    <button id="cart-btn">Cart (<span id="cart-count">0</span>)</button>
+  </header>
 
-        <div id="empty-cart" class="empty-cart">
-            <p>Your cart is empty</p>
-            <button id="continue-shopping-btn" class="continue-shopping-btn">Continue Shopping</button>
-        </div>
+  <main class="cart-page">
+    <h2>Your Shopping Cart</h2>
 
-        <div id="cart-content" class="cart-content hidden">
-            <div id="cart-items" class="cart-items-list"></div>
-
-            <div class="cart-summary">
-                <div class="cart-total">
-                    <p>Total: Ksh <span id="cart-total">0</span></p>
-                </div>
-                <div class="cart-actions">
-                    <button id="checkout-btn" class="checkout-btn">Proceed to Checkout</button>
-                    <button id="continue-shopping-btn" class="continue-shopping-btn">Continue Shopping</button>
-                </div>
-            </div>
-        </div>
+    <div id="empty-cart" class="empty-cart">
+      <p>Your cart is empty</p>
+      <button id="continue-shopping-btn" class="continue-shopping-btn">
+        Continue Shopping
+      </button>
     </div>
 
-    <div class="pagination">
-        <button id="back-home-btn" class="pagination-btn">Back to Home</button>
+    <div id="cart-content" class="cart-content hidden">
+      <div id="cart-items" class="cart-items-list"></div>
+
+      <div class="cart-summary">
+        <div class="cart-total">
+          <p>Total: Ksh <span id="cart-total">0</span></p>
+        </div>
+        <div class="cart-actions">
+          <button id="checkout-btn" class="checkout-btn">Proceed to Checkout</button>
+          <button id="continue-shopping-btn-2" class="continue-shopping-btn">
+            Continue Shopping
+          </button>
+        </div>
+      </div>
     </div>
+  </main>
 
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>UJI Kenya</h3>
-                <p>Bringing authentic Kenyan Uji to the world</p>
-            </div>
-            <div class="footer-section">
-                <h3>Contact Us</h3>
-                <p>Email: info@ujikenya.com</p>
-                <p>Phone: +254 700 123 456</p>
-                <p>Nairobi, Kenya</p>
-            </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <p>Facebook | Twitter | Instagram</p>
-            </div>
-            <div class="footer-section">
-                <h3>Legal</h3>
-                <p>Terms of Service | Privacy Policy</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 UJI Kenya. All rights reserved.</p>
-        </div>
-    </footer>
+  <div class="pagination">
+    <button id="back-home-btn" class="pagination-btn">Back to Home</button>
+  </div>
 
-    <div id="floating-message" class="floating-message hidden">Message</div>
-
-    <!-- Login Modal -->
-    <div id="login-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal" data-modal="login-modal">&times;</span>
-            <h2>Login</h2>
-            <form id="login-form">
-                <input type="email" id="login-email" placeholder="Email" required>
-                <input type="password" id="login-password" placeholder="Password" required>
-                <button type="submit">Login</button>
-                <button type="button" id="cancel-login">Cancel</button>
-            </form>
-            <p>Don't have an account? <a href="#" id="switch-to-register">Register here</a></p>
-        </div>
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>UJI Kenya</h3>
+        <p>Bringing authentic Kenyan Uji to the world</p>
+      </div>
+      <div class="footer-section">
+        <h3>Contact Us</h3>
+        <p>Email: info@ujikenya.com</p>
+        <p>Phone: +254 700 123 456</p>
+        <p>Nairobi, Kenya</p>
+      </div>
+      <div class="footer-section">
+        <h3>Follow Us</h3>
+        <p>Facebook | Twitter | Instagram</p>
+      </div>
+      <div class="footer-section">
+        <h3>Legal</h3>
+        <p>Terms of Service | Privacy Policy</p>
+      </div>
     </div>
-
-    <!-- Register Modal -->
-    <div id="register-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal" data-modal="register-modal">&times;</span>
-            <h2>Register</h2>
-            <form id="register-form">
-                <input type="text" id="register-name" placeholder="Full Name" required>
-                <input type="email" id="register-email" placeholder="Email" required>
-                <input type="password" id="register-password" placeholder="Password" required>
-                <button type="submit">Register</button>
-                <button type="button" id="cancel-register">Cancel</button>
-            </form>
-            <p>Already have an account? <a href="#" id="switch-to-login">Login here</a></p>
-        </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 UJI Kenya. All rights reserved.</p>
     </div>
+  </footer>
 
-    <script src="api.js"></script>
-    <script src="script.js"></script>
-    <script src="cart.js"></script>
+  <div id="floating-message" class="floating-message hidden">Message</div>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal" data-modal="login-modal">&times;</span>
+      <h2>Login</h2>
+      <form id="login-form">
+        <input type="email" id="login-email" placeholder="Email" required />
+        <input type="password" id="login-password" placeholder="Password" required />
+        <button type="submit">Login</button>
+        <button type="button" id="cancel-login">Cancel</button>
+      </form>
+      <p>Don't have an account? <a href="#" id="switch-to-register">Register here</a></p>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="register-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal" data-modal="register-modal">&times;</span>
+      <h2>Register</h2>
+      <form id="register-form">
+        <input type="text" id="register-name" placeholder="Full Name" required />
+        <input type="email" id="register-email" placeholder="Email" required />
+        <input type="password" id="register-password" placeholder="Password" required />
+        <button type="submit">Register</button>
+        <button type="button" id="cancel-register">Cancel</button>
+      </form>
+      <p>Already have an account? <a href="#" id="switch-to-login">Login here</a></p>
+    </div>
+  </div>
+
+  <!-- ✅ Use relative paths -->
+  <script src="api.js"></script>
+  <script src="script.js"></script>
+  <script src="cart.js"></script>
 </body>
 </html>

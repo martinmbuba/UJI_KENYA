@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <script>
+        // Polyfill to reduce console noise from browser extensions that reference
+        // the WebExtensions `browser` global (some extensions assume Firefox).
+        // This provides a harmless fallback so extension scripts don't throw
+        // a ReferenceError in Chrome/other browsers.
+        window.browser = window.browser || window.chrome || {};
+    </script>
     <header>
         <div class="header-left">
             <img src="src/images/CEO.jpeg" alt="CEO" class="ceo-image">
@@ -115,7 +122,7 @@
             <p>&copy; 2024 UJI Kenya. All rights reserved.</p>
         </div>
     </footer>
-    <script src="api.js"></script>
-    <script src="script.js"></script>
+    <script src="/api.js"></script>
+    <script src="/script.js"></script>
 </body>
 </html>

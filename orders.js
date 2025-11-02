@@ -1,23 +1,26 @@
-// Orders data (will be loaded from API)
-let orders = [];
+// Wrap orders page code in an IIFE so top-level declarations don't clash
+(function() {
+    // Orders data (will be loaded from API)
+    let orders = [];
 
-// DOM elements
-const ordersList = document.getElementById('orders-list');
-const noOrders = document.getElementById('no-orders');
-const loginModal = document.getElementById('login-modal');
-const registerModal = document.getElementById('register-modal');
-const loginForm = document.getElementById('login-form');
-const registerForm = document.getElementById('register-form');
-const switchToRegister = document.getElementById('switch-to-register');
-const switchToLogin = document.getElementById('switch-to-login');
-const cancelLogin = document.getElementById('cancel-login');
-const cancelRegister = document.getElementById('cancel-register');
+    // DOM elements
+    const ordersList = document.getElementById('orders-list');
+    const noOrders = document.getElementById('no-orders');
+    const loginModal = document.getElementById('login-modal');
+    const registerModal = document.getElementById('register-modal');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const switchToRegister = document.getElementById('switch-to-register');
+    const switchToLogin = document.getElementById('switch-to-login');
+    const cancelLogin = document.getElementById('cancel-login');
+    const cancelRegister = document.getElementById('cancel-register');
 
-// Prevent double-initialization when the script is loaded multiple times
-if (window._ordersInit) {
-    // Re-render orders if needed
-    displayOrders();
-} else {
+    // Prevent double-initialization when the script is loaded multiple times
+    if (window._ordersInit) {
+        // Re-render orders if needed
+        displayOrders();
+        return;
+    }
     window._ordersInit = true;
 
 // Display orders
@@ -316,4 +319,4 @@ async function loadOrders() {
 loadOrders();
 updateAuthUI(api.isLoggedIn());
 
-} // end of _ordersInit guard
+})();
