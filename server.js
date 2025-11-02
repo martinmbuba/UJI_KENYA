@@ -15,6 +15,35 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname)));
 
+// Specific routes for static files to ensure they are served on Vercel
+app.get('/styles.css', (req, res) => {
+    res.sendFile(path.join(__dirname, 'styles.css'));
+});
+
+app.get('/script.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'script.js'));
+});
+
+app.get('/api.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'api.js'));
+});
+
+app.get('/cart.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cart.js'));
+});
+
+app.get('/orders.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'orders.js'));
+});
+
+app.get('/cart.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cart.html'));
+});
+
+app.get('/orders.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'orders.html'));
+});
+
 // Data storage (in production, use a database)
 let users = [];
 let orders = [];
