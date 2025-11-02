@@ -113,7 +113,8 @@ header h1 {
 
 .pagination {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 1rem;
     margin: 2rem 0;
 }
 

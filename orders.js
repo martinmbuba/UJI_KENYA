@@ -160,17 +160,17 @@ loginBtn.addEventListener('click', () => {
 });
 
 // Navigation buttons
-backHomeContentBtn.addEventListener('click', () => {
-    window.location.href = 'index.html';
-});
-
-cartBtn.addEventListener('click', () => {
-    window.open('cart.html', '_blank');
-});
-
-ordersBtn.addEventListener('click', () => {
-    // Already on orders page, could refresh or do nothing
-    displayOrders();
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'back-home-content-btn') {
+        window.location.href = 'index.html';
+    } else if (e.target.id === 'cart-btn') {
+        window.open('cart.html', '_blank');
+    } else if (e.target.id === 'orders-btn') {
+        // Already on orders page, could refresh or do nothing
+        displayOrders();
+    } else if (e.target.id === 'start-shopping-btn') {
+        window.location.href = 'index.html';
+    }
 });
 
 // Modal close functionality

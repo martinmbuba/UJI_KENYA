@@ -167,17 +167,17 @@ ceoImage.addEventListener('click', () => {
 });
 
 // Navigation buttons
-backHomeBtn.addEventListener('click', () => {
-    window.location.href = 'index.html';
-});
-
-cartBtn.addEventListener('click', () => {
-    // Already on cart page, could refresh or do nothing
-    displayCart();
-});
-
-ordersBtn.addEventListener('click', () => {
-    window.open('orders.html', '_blank');
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'back-home-btn') {
+        window.location.href = 'index.html';
+    } else if (e.target.id === 'cart-btn') {
+        // Already on cart page, could refresh or do nothing
+        displayCart();
+    } else if (e.target.id === 'orders-btn') {
+        window.open('orders.html', '_blank');
+    } else if (e.target.id === 'continue-shopping-btn') {
+        window.location.href = 'index.html';
+    }
 });
 
 // Auth button functionality
