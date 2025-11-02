@@ -226,6 +226,11 @@ app.put('/api/orders/:orderId', authenticateToken, (req, res) => {
     }
 });
 
+// Serve index.html for root route
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Get products (for frontend)
 app.get('/api/products', (req, res) => {
     const products = [
