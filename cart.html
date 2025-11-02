@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - UJI MERU</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <img src="src/images/CEO.jpeg" alt="CEO" class="ceo-image">
+            <h1>UJI MERU</h1>
+        </div>
+        <input type="text" id="search" placeholder="Search products...">
+        <div class="auth-buttons">
+            <button id="register-btn">Register</button>
+            <button id="login-btn">Login</button>
+        </div>
+        <div class="header-actions">
+            <button id="back-home-btn">Back to Home</button>
+            <button id="cart-btn">Cart (<span id="cart-count">0</span>)</button>
+            <button id="orders-btn">My Orders</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="cart-page">
+            <h2>Your Shopping Cart</h2>
+
+            <div id="empty-cart" class="empty-cart">
+                <p>Your cart is empty</p>
+                <a href="index.html" class="continue-shopping-btn">Continue Shopping</a>
+            </div>
+
+            <div id="cart-content" class="cart-content hidden">
+                <div id="cart-items" class="cart-items-list"></div>
+
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <p>Total: Ksh <span id="cart-total">0</span></p>
+                    </div>
+                    <div class="cart-actions">
+                        <button id="checkout-btn" class="checkout-btn">Proceed to Checkout</button>
+                        <a href="index.html" class="continue-shopping-btn">Continue Shopping</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="floating-message" class="floating-message hidden">Message</div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="login-modal">&times;</span>
+            <h2>Login</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Password" required>
+                <button type="submit">Login</button>
+                <button type="button" id="cancel-login">Cancel</button>
+            </form>
+            <p>Don't have an account? <a href="#" id="switch-to-register">Register here</a></p>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="register-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" data-modal="register-modal">&times;</span>
+            <h2>Register</h2>
+            <form id="register-form">
+                <input type="text" id="register-name" placeholder="Full Name" required>
+                <input type="email" id="register-email" placeholder="Email" required>
+                <input type="password" id="register-password" placeholder="Password" required>
+                <button type="submit">Register</button>
+                <button type="button" id="cancel-register">Cancel</button>
+            </form>
+            <p>Already have an account? <a href="#" id="switch-to-login">Login here</a></p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>UJI Meru</h3>
+                <p>Bringing authentic Kenyan Uji to the world</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: info@ujikenya.com</p>
+                <p>Phone: +254 700 123 456</p>
+                <p>Nairobi, Kenya</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <p>Facebook | Twitter | Instagram</p>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <p>Terms of Service | Privacy Policy</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 UJI Meru. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="cart.js"></script>
+</body>
+</html>
