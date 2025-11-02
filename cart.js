@@ -1,8 +1,8 @@
 // Products will be loaded from API
 let products = [];
 
-// Load cart from localStorage
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+// Use global cart from window object
+let cart = window.cart || [];
 
 // DOM elements
 const cartItems = document.getElementById('cart-items');
@@ -72,6 +72,7 @@ function increaseQuantity(productId) {
     const item = cart.find(item => item.id === productId);
     if (item) {
         item.quantity++;
+        window.cart = cart; // Update global cart
         saveCart();
         displayCart();
     }
@@ -85,6 +86,7 @@ function decreaseQuantity(productId) {
         if (item.quantity <= 0) {
             removeFromCart(productId);
         } else {
+            window.cart = cart; // Update global cart
             saveCart();
             displayCart();
         }
@@ -94,6 +96,7 @@ function decreaseQuantity(productId) {
 // Remove from cart
 function removeFromCart(productId) {
     cart = cart.filter(item => item.id !== productId);
+    window.cart = cart; // Update global cart
     saveCart();
     displayCart();
 }
@@ -146,6 +149,7 @@ checkoutBtn.addEventListener('click', async () => {
         const response = await api.createOrder(orderData);
         showFloatingMessage(`Checkout successful! Order #${response.order.id} placed. Total: Ksh ${total}`);
         cart = [];
+        window.cart = cart; // Update global cart
         saveCart();
         displayCart();
     } catch (error) {
@@ -156,9 +160,11 @@ checkoutBtn.addEventListener('click', async () => {
 // Navigation buttons
 document.addEventListener('click', (e) => {
     if (e.target.id === 'back-home-btn') {
-        window.location.href = 'index.html';
+        // Load home page content
+        window.location.href = '/';
     } else if (e.target.id === 'continue-shopping-btn') {
-        window.location.href = 'index.html';
+        // Load home page content
+        window.location.href = '/';
     }
 });
 
@@ -282,6 +288,4 @@ async function loadProducts() {
     }
 }
 
-// Initialize
-loadProducts();
-displayCart();
+// Initialize (called from script.js after page load)

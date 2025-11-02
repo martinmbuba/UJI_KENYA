@@ -1,6 +1,7 @@
 class API {
     constructor() {
-        this.baseURL = 'http://localhost:3000/api';
+        // Use relative URLs for production (Vercel), localhost for development
+        this.baseURL = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
         this.token = localStorage.getItem('token');
     }
 

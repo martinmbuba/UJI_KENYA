@@ -91,21 +91,28 @@ async function reorder(orderId) {
     const order = orders.find(o => o.id === orderId);
     if (order) {
         try {
-            // Create a new order via API
-            const orderData = {
-                items: order.items.map(item => ({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                    image: item.image
-                })),
-                total: order.total
-            };
+            // Add items to cart
+            order.items.forEach(item => {
+                const existingItem = window.cart.find(cartItem => cartItem.id === item.id);
+                if (existingItem) {
+                    existingItem.quantity += item.quantity;
+                } else {
+                    window.cart.push({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity,
+                        image: item.image
+                    });
+                }
+            });
 
-            const response = await api.createOrder(orderData);
-            showFloatingMessage(`Order reordered successfully! New order #${response.order.id} placed.`);
-            loadOrders(); // Refresh orders from API
+            // Save cart to localStorage
+            localStorage.setItem('cart', JSON.stringify(window.cart));
+
+            showFloatingMessage(`Items added to cart successfully!`);
+            // Navigate to cart page
+            loadCartPage();
         } catch (error) {
             showFloatingMessage(error.message || 'Reorder failed');
         }
@@ -139,9 +146,11 @@ ordersList.addEventListener('click', (e) => {
 // Navigation buttons
 document.addEventListener('click', (e) => {
     if (e.target.id === 'back-home-content-btn') {
-        window.location.href = 'index.html';
+        // Load home page content
+        window.location.href = '/';
     } else if (e.target.id === 'start-shopping-btn') {
-        window.location.href = 'index.html';
+        // Load home page content
+        window.location.href = '/';
     }
 });
 
@@ -264,5 +273,4 @@ async function loadOrders() {
     }
 }
 
-// Initialize
-loadOrders();
+// Initialize (called from script.js after page load)

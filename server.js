@@ -261,8 +261,22 @@ app.put('/api/orders/:orderId', authenticateToken, (req, res) => {
     }
 });
 
-// Serve index.html for root route
+// Serve index.html for root route and any route that doesn't match static files
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Catch-all handler for SPA routing (serve index.html for any non-API routes)
+app.use((req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+        return next();
+    }
+    // Skip static file routes
+    if (req.path.match(/\.(css|js|html|jpeg|png|jpg|gif)$/)) {
+        return next();
+    }
+    // Serve index.html for all other routes (SPA routing)
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
